@@ -42,7 +42,7 @@ exports.getNextUniqueId = (callback) => {
   readCounter((error, currentCount) => {
     writeCounter(currentCount + 1, (error, counterString) => {
       callback(error, counterString);
-    })
+    });
   });
 };
 
