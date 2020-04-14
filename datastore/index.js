@@ -39,18 +39,14 @@ var asyncReadOne = Promise.promisify(exports.readOne);
 
 exports.readAll = (callback) => {
   fs.readdir(exports.dataDir, (err, files) => {
-    if (err) {
-      throw (`READ FILE ERROR: No item with id: ${id}`);
-    } else {
-      let promiseRead = _.map(files, (file) => {
-        let id = file.replace('.txt', '');
-        return asyncReadOne(id);
-      });
-      Promise.all(promiseRead)
-        .then((result) => {
-          callback(null, result);
-        });
-    }
+    let promiseRead = _.map(files, (file) => {
+      let id = file.replace('.txt', '');
+      return asyncReadOne(id);
+    });
+    Promise.all(promiseRead)
+      .then((result) => {
+      callback(null, result);
+    });
   });
 };
 
