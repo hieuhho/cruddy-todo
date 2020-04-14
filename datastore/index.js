@@ -23,30 +23,7 @@ exports.create = (text, callback) => {
     }
   });
 };
-/*
-return an array of todos
-read dataDir to build file list
-*/
 
-
-//Promise.all
-
-exports.readAll = (callback) => {
-  fs.readdir(exports.dataDir, (err, files) => {
-    if (err) {
-      throw (`READ FILE ERROR: No item with id: ${id}`);
-    } else {
-      let promiseRead = _.map(files, (file) => {
-        let id = file.replace(".txt", "");
-        return asyncReadOne(id);
-      });
-      Promise.all(promiseRead)
-      .then((result) => {
-        callback(null, result);
-      });
-    }
-  });
-};
 
 exports.readOne = (id, callback) => {
   fs.readFile(`${exports.dataDir}/${id}.txt`, 'utf8', (err, data) => {
@@ -60,21 +37,23 @@ exports.readOne = (id, callback) => {
 
 var asyncReadOne = Promise.promisify(exports.readOne);
 
-// refactor later
+exports.readAll = (callback) => {
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      throw (`READ FILE ERROR: No item with id: ${id}`);
+    } else {
+      let promiseRead = _.map(files, (file) => {
+        let id = file.replace('.txt', '');
+        return asyncReadOne(id);
+      });
+      Promise.all(promiseRead)
+        .then((result) => {
+          callback(null, result);
+        });
+    }
+  });
+};
 
-// exports.update = (id, text, callback) => {
-//   exports.readOne(id, (err, data) => {
-//     fs.writeFile(`${exports.dataDir}/${id}.txt`, text, (err) => {
-//       if (err) {
-//         throw ('WRITE FILE ERROR', err);
-
-//         // callback(new Error(`No item with id: ${id}`));
-//       } else {
-//         callback(null, {id, text});
-//       }
-//     })
-//   });
-// }
 
 exports.update = (id, text, callback) => {
   fs.readFile(`${exports.dataDir}/${id}.txt`, 'utf8', (err, data) => {
