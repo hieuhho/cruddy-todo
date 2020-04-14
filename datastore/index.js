@@ -10,7 +10,7 @@ var items = {};
 exports.create = (text, callback) => {
   counter.getNextUniqueId((err, id)=>{
     if (err) {
-      throw ('GET ID ERROR')
+      throw ('GET ID ERROR');
     } else {
       fs.writeFile(path.join(exports.dataDir, `${id}.txt`), text, (err) => {
         if (err) {
@@ -22,21 +22,34 @@ exports.create = (text, callback) => {
     }
   });
 };
+/*
+return an array of todos
+read dataDir to build file list
+*/
+
 
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
+  fs.readdir(exports.dataDir, (err, files) => {
+    let result = [];
+    if (err) {
+      throw('READ ALL ERROR');
+    } else {
+      _.map(files, (file) => {
+        let id = file.replace('.txt', '');
+        result.push({id: id, text: id});
+      });
+    } callback(null, result);
   });
-  callback(null, data);
 };
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  fs.readFile(`${exports.dataDir}/${id}.txt`, {encoding: 'utf8'}, (err, data) => {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      callback(null, {id: id, text: data})
+    }
+  });
 };
 
 exports.update = (id, text, callback) => {
