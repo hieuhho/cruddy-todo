@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
+const Promise = require('bluebird');
 
 var items = {};
 
@@ -28,17 +29,22 @@ read dataDir to build file list
 */
 
 
+//Promise.all
+
 exports.readAll = (callback) => {
   fs.readdir(exports.dataDir, (err, files) => {
-    let result = [];
     if (err) {
       throw (`READ FILE ERROR: No item with id: ${id}`);
     } else {
-      _.map(files, (file) => {
-        let id = file.replace('.txt', '');
-        result.push({id: id, text: id});
+      let promiseRead = _.map(files, (file) => {
+        let id = file.replace(".txt", "");
+        return asyncReadOne(id);
       });
-    } callback(null, result);
+      Promise.all(promiseRead)
+      .then((result) => {
+        callback(null, result);
+      });
+    }
   });
 };
 
@@ -51,6 +57,8 @@ exports.readOne = (id, callback) => {
     }
   });
 };
+
+var asyncReadOne = Promise.promisify(exports.readOne);
 
 // refactor later
 
