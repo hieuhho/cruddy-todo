@@ -24,6 +24,20 @@ exports.create = (text, callback) => {
   });
 };
 
+// exports.create = (text) => {
+//   return new Promise((resolve, reject) => {
+
+//   counter.getNextUniqueId((err, id) => {
+//     if (err) { reject(err); }
+//     else {
+//       fs.writeFileSync(path.join(exports.dataDir, `${id}.txt`), text);
+//       resolve( {id: id, text: text} );
+//     };
+//   });
+// });
+// }
+
+
 
 exports.readOne = (id, callback) => {
   fs.readFile(`${exports.dataDir}/${id}.txt`, 'utf8', (err, data) => {
@@ -45,8 +59,8 @@ exports.readAll = (callback) => {
     });
     Promise.all(promiseRead)
       .then((result) => {
-      callback(null, result);
-    });
+        callback(null, result);
+      });
   });
 };
 

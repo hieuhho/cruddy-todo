@@ -15,35 +15,72 @@ const zeroPaddedNumber = (num) => {
   return sprintf('%05d', num);
 };
 
-const readCounter = (callback) => {
-  fs.readFile(exports.counterFile, (err, fileData) => {
-    if (err) {
-      callback(null, 0);
-    } else {
-      callback(null, Number(fileData));
-    }
+//MINIMUM REQUIREMENTS FUNCTIONS
+
+// const readCounter = (callback) => {
+//   fs.readFile(exports.counterFile, (err, fileData) => {
+//     if (err) {
+//       callback(null, 0);
+//     } else {
+//       callback(null, Number(fileData));
+//     }
+//   });
+// };
+
+// const writeCounter = (count, callback) => {
+//   var counterString = zeroPaddedNumber(count);
+//   fs.writeFile(exports.counterFile, counterString, (err) => {
+//     if (err) {
+//       throw ('error writing counter');
+//     } else {
+  //       callback(null, counterString);
+  //     }
+  //   });
+  // };
+
+  // exports.getNextUniqueId = (callback) => {
+  //   readCounter((error, currentCount) => {
+  //     writeCounter(currentCount + 1, (error, counterString) => {
+  //       callback(error, counterString);
+  //     });
+  //   });
+  // };
+
+
+const readCounter = () => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(exports.counterFile, (err, fileData) => {
+      if (err) { reject (err); }
+      else {
+        resolve(Number(fileData));
+      }
+    });
   });
 };
 
-const writeCounter = (count, callback) => {
-  var counterString = zeroPaddedNumber(count);
-  fs.writeFile(exports.counterFile, counterString, (err) => {
-    if (err) {
-      throw ('error writing counter');
-    } else {
-      callback(null, counterString);
-    }
+const writeCounter = (count) => {
+  return new Promise((resolve, reject) => {
+    let counterString = zeroPaddedNumber(count);
+    fs.writeFile(exports.counterFile, counterString, (err) => {
+      if (err) { reject(err); }
+      else {
+        resolve(counterString);
+      }
+    });
   });
 };
 
 // Public API - Fix this function //////////////////////////////////////////////
 
-exports.getNextUniqueId = (callback) => {
-  readCounter((error, currentCount) => {
-    writeCounter(currentCount + 1, (error, counterString) => {
-      callback(error, counterString);
-    });
-  });
+
+//Async functions may not play nice with scoped variables
+
+exports.getNextUniqueId = (cb) => {
+  return readCounter()
+  .then((count) => (count += 1))
+  .then((newCount) => writeCounter(newCount))
+  .then((result) => cb(null,result))
+  .catch((err) => cb(err,null))
 };
 
 
